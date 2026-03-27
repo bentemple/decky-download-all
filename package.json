@@ -1,7 +1,7 @@
 {
   "name": "download-all",
   "version": "1.0.0",
-  "description": "Adds a Download All button via the decky plugin UI to trigger all downloads.",
+  "description": "A plugin that let's the user immediately queue all scheduled downloads to immediately download.",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
