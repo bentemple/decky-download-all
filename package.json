@@ -1,6 +1,6 @@
 {
   "name": "download-all",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "description": "A plugin that let's the user immediately queue all scheduled downloads to immediately download.",
   "type": "module",
   "scripts": {

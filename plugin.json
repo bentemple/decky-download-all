@@ -5,6 +5,7 @@
   "api_version": 1,
   "publish": {
     "tags": ["downloads", "queue"],
-    "description": "Download All - A plugin that let's the user immediately queue all scheduled downloads to immediately download."
+    "description": "Download All - A plugin that let's the user immediately queue all scheduled downloads to immediately download.",
+    "image": "https://raw.githubusercontent.com/bentemple/decky-download-all/main/assets/preview.png"
   }
 }
