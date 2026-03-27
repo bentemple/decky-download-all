@@ -1,7 +1,7 @@
 {
-  "name": "decky-plugin-template",
-  "version": "0.0.1",
-  "description": "A template to quickly create decky plugins from scratch, based on TypeScript and webpack",
+  "name": "download-all",
+  "version": "1.0.0",
+  "description": "Adds a Download All button via the decky plugin UI to trigger all downloads.",
   "type": "module",
   "scripts": {
     "build": "rollup -c",
@@ -15,11 +15,12 @@
   "keywords": [
     "decky",
     "plugin",
-    "plugin-template",
     "steam-deck",
-    "deck"
+    "deck",
+    "download",
+    "download-all"
   ],
-  "author": "You <you@you.tld>",
+  "author": "Ben Temple <ben@bt0.dev>",
   "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/SteamDeckHomebrew/decky-plugin-template/issues"
