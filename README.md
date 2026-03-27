@@ -14,5 +14,3 @@ The downloader always schedules downloads below the existing active queue, order
 # Screenshots
 
 <img width="1280" height="800" alt="image" src="https://github.com/user-attachments/assets/c9845478-40db-44c5-9c92-a3784e9cb555" />
-
-<img width="1280" height="800" alt="image" src="https://github.com/user-attachments/assets/ed873104-7a28-4bea-a8b9-3b304e2a743b" />
