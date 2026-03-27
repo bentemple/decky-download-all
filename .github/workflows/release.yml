@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Get plugin name
+        id: plugin
+        run: |
+          NAME=$(jq -r '.name' package.json)
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+
+      - name: Create release directory structure
+        run: |
+          mkdir -p release/${{ steps.plugin.outputs.name }}
+          cp -r dist release/${{ steps.plugin.outputs.name }}/
+          cp package.json release/${{ steps.plugin.outputs.name }}/
+          cp plugin.json release/${{ steps.plugin.outputs.name }}/
+          cp LICENSE release/${{ steps.plugin.outputs.name }}/
+          # Include main.py if it exists (Python backend)
+          [ -f main.py ] && cp main.py release/${{ steps.plugin.outputs.name }}/ || true
+          # Include py_modules if not empty
+          if [ -d py_modules ] && [ "$(ls -A py_modules 2>/dev/null)" ]; then
+            cp -r py_modules release/${{ steps.plugin.outputs.name }}/
+          fi
+          # Include defaults if not empty
+          if [ -d defaults ] && [ "$(ls -A defaults 2>/dev/null)" ]; then
+            cp -r defaults release/${{ steps.plugin.outputs.name }}/
+          fi
+          # Include bin if it exists
+          [ -d bin ] && cp -r bin release/${{ steps.plugin.outputs.name }}/ || true
+
+      - name: Create zip
+        run: |
+          cd release
+          zip -r ../${{ steps.plugin.outputs.name }}.zip .
+
+      - name: Create draft release
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --draft \
+            --generate-notes \
+            --title "${{ github.ref_name }}" \
+            ${{ steps.plugin.outputs.name }}.zip
+        env:
+          GH_TOKEN: ${{ github.token }}
