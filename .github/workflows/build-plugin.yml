@@ -1,0 +1,53 @@
+name: Build Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      artifact-name:
+        description: "Name of the uploaded artifact"
+        value: ${{ jobs.build.outputs.artifact-name }}
+
+jobs:
+  build:
+    name: Build Decky plugin
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.set-artifact-name.outputs.name }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set artifact name from package.json
+      id: set-artifact-name
+      run: |
+        PLUGIN_NAME=$(jq -r '.name' package.json)
+        echo "name=${PLUGIN_NAME}" >> $GITHUB_OUTPUT
+
+    - uses: pnpm/action-setup@v3
+      with:
+        version: 9.4.0
+
+    - name: Download Decky CLI
+      run: |
+        mkdir /tmp/decky-cli
+        curl -L -o /tmp/decky-cli/decky "https://github.com/SteamDeckHomebrew/cli/releases/download/0.0.7/decky-linux-x86_64"
+        chmod +x /tmp/decky-cli/decky
+        echo "/tmp/decky-cli" >> $GITHUB_PATH
+
+    - name: Build plugin
+      run: |
+        # Run the CLI as root to get around Docker's weird permissions
+        sudo $(which decky) plugin build -b -o /tmp/output -s directory .
+        sudo chown -R $(whoami) .
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ steps.set-artifact-name.outputs.name }}
+        path: /tmp/output/*.zip
