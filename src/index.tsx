@@ -7,6 +7,7 @@ import {
 } from "@decky/ui";
 import { useState, useEffect, useRef, FC } from "react";
 import { FaDownload, FaCheck } from "react-icons/fa";
+import { logger } from "./logger";
 // Set to true to show debug info in the UI
 const DEBUG = false;
 
@@ -108,6 +109,7 @@ const PluginContent: FC = () => {
         items = arr as DownloadItem[];
       }
       const pending = items.filter((d) => !d.completed);
+      logger.info(`Downloads updated: ${items.length} total, ${pending.length} pending (${items.length - pending.length} completed)`);
       setDownloads(pending);
     });
     return () => reg.unregister();
@@ -118,6 +120,7 @@ const PluginContent: FC = () => {
 
 
   const handleDownloadAll = () => {
+    logger.info(`Queue downloads clicked: ${downloads.length} pending downloads, mode: ${settings.mode}`);
     // Start with items NOT in the queue
     let items = downloads.filter(isUnqueued);
 
@@ -143,9 +146,11 @@ const PluginContent: FC = () => {
     // Sort smallest first
     items.sort((a, b) => getTotalBytes(a) - getTotalBytes(b));
 
+    logger.info(`Queueing ${items.length} downloads (mode: ${settings.mode})`);
     for (let i = 0; i < items.length; i++) {
       const sizeMB = (getTotalBytes(items[i]) / (1024 * 1024)).toFixed(1);
       const name = window.appStore?.GetAppOverviewByAppID(items[i].appid)?.display_name ?? items[i].appid;
+      logger.info(`  [${i + 1}] ${name} (${items[i].appid}), size=${sizeMB} MB`);
     }
 
     // Find the end of the current queue
@@ -154,6 +159,7 @@ const PluginContent: FC = () => {
     // SteamOS 3.8+ queue methods take a remote_client_id as second arg ("0" = local machine).
     // Pre-3.8 methods take only the appid. Cast to any since the lib types are outdated.
     const dl = SteamClient.Downloads as any;
+    logger.info(`QueueAppUpdate.length=${dl.QueueAppUpdate?.length}, SetQueueIndex.length=${dl.SetQueueIndex?.length}, ResumeAppUpdate.length=${dl.ResumeAppUpdate?.length}`);
 
     // Add items to queue, then position them (smallest first at end of existing queue)
     for (let i = 0; i < items.length; i++) {
@@ -268,6 +274,7 @@ const PluginContent: FC = () => {
 
 // Plugin entry
 export default definePlugin(() => {
+  logger.info("Download All plugin initialized");
   return {
     name: "Download All Button",
     content: <PluginContent />,
